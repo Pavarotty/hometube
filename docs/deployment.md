@@ -1,6 +1,6 @@
 # 🚀 Deployment Guide
 
-Production deployment strategies for the YouTube Video Downloader.
+Production deployment strategies for the Universal Video Downloader.
 
 ## 🏠 HomeLab Deployment
 

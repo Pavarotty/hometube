@@ -9,7 +9,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.49+-red.svg)](https://streamlit.io)
 [![Latest Release](https://img.shields.io/github/v/release/EgalitarianMonkey/hometube)](https://github.com/EgalitarianMonkey/hometube/releases)
-[![Docker Image](https://ghcr-badge.egpl.dev/EgalitarianMonkey/hometube/latest_tag?trim=major&label=Docker)](https://github.com/EgalitarianMonkey/hometube/pkgs/container/hometube)
+[![Docker Image](https://ghcr-badge.egpl.dev/egalitarianmonkey/hometube/latest_tag?trim=major&label=Docker)](https://github.com/EgalitarianMonkey/hometube/pkgs/container/hometube)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-green.svg)](LICENSE)
 
 <br/>
@@ -95,7 +95,7 @@ docker run -p 8501:8501 \
   -e TZ=Europe/Paris \
   -v ./downloads:/data/Videos \
   -v ./cookies:/config \
-  ghcr.io/EgalitarianMonkey/hometube:latest
+  ghcr.io/egalitarianmonkey/hometube:latest
 
 # Access at http://localhost:8501
 ```
@@ -107,7 +107,7 @@ docker run -p 8501:8501 \
 version: '3.8'
 services:
   hometube:
-    image: ghcr.io/EgalitarianMonkey/hometube:latest
+    image: ghcr.io/egalitarianmonkey/hometube:latest
     ports:
       - "8501:8501"
     environment:
@@ -203,7 +203,7 @@ Expected output:
 |-----------|------------|---------|
 | **Backend** | Python 3.10+, yt-dlp, FFmpeg | Core processing |
 | **Frontend** | Streamlit | Web interface |
-| **Container** | Docker, multi-arch | Deployment |
+| **Container** | 🐳 jauderho/yt-dlp (Alpine + yt-dlp + FFmpeg) | Optimized deployment |
 | **CI/CD** | GitHub Actions | Automation |
 | **Testing** | pytest, coverage | Quality assurance |
 | **Dependencies** | UV, conda, pip | Package management |
