@@ -76,9 +76,14 @@ TRANSLATIONS = {
     "quality_auto_info": "🎬 &nbsp; Quality: Auto (best available) - Click 'Detect qualities' to see options",
     # === EMBEDDING ===
     "embedding_title": "📦 &nbsp; Video Embedding",
-    "embedding_presentation": "Output video formats allow the integration of subtitles and chapters.\n\nChapter integration can sometimes interfere with video cuts.",
+    # Subtitles section
+    "subtitles_section_title": "📝 &nbsp; Subtitles",
+    "subtitles_info": "**Auto-generated subtitles** often have poor formatting and readability issues. They tend to stick together and chain in an illegible way. Only the YouTube client can display them correctly.\nWe keep the write-auto-subs option because having imperfect subtitles is better than having none at all.",
     "embed_subs": "Embed subtitles into the video",
     "embed_subs_help": "Embeds subtitles into the MKV.",
+    # Chapters section
+    "chapters_section_title": "📑 &nbsp; Chapters",
+    "chapters_info": "**Chapter markers** Chapter markers help navigate through the video content and can be embedded directly into the video file.\nChapter embedding can sometimes interfere with video cuts.",
     "embed_chapters": "Embed chapters into the video",
     "embed_chapters_help": "Adds chapter markers to the file (may sometimes interfere with exotic merges).",
     # === COOKIES MANAGEMENT ===

@@ -76,9 +76,14 @@ TRANSLATIONS = {
     "quality_auto_info": "🎬 &nbsp; Qualité: Auto (meilleure disponible) - Cliquez sur 'Détecter qualités' pour voir les options",
     # === EMBEDDING ===
     "embedding_title": "📦 &nbsp; Intégrations Vidéo",
-    "embedding_presentation": "Les formats de vidéo en sortie permettent l'intégration des sous-titres et chapitres.\n\nL'intégration des chapitres peut parfois causer des problèmes avec des coupes.",
+    # Subtitles section
+    "subtitles_section_title": "📝 &nbsp; Sous-titres",
+    "subtitles_info": "**Les sous-titres auto-générés** ont souvent un formatage médiocre et des problèmes de lisibilité. Ils collent et s'enchaînent de façon assez illisible. Seul le client YouTube est capable de les afficher correctement.\nNous gardons l'option write-auto-subs car avoir des sous-titres imparfaits vaut mieux que ne rien avoir du tout.",
     "embed_subs": "Intégrer les sous-titres à la vidéo",
     "embed_subs_help": "Intègre les sous-titres dans le fichier MKV.",
+    # Chapters section
+    "chapters_section_title": "📑 &nbsp; Chapitres",
+    "chapters_info": "**Les marqueurs de chapitres** aident à naviguer dans le contenu vidéo et peuvent être intégrés directement dans le fichier vidéo.\nL'intégration de chapitres peut parfois interférer avec les coupes vidéo.",
     "embed_chapters": "Intégrer les chapitres à la vidéo",
     "embed_chapters_help": "Ajoute des marqueurs de chapitres au fichier (peut parfois interférer avec des fusions exotiques).",
     # Cookie management

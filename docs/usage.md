@@ -88,7 +88,13 @@ downloads/
 
 ## 🔒 Authentication & Private Content
 
-### Browser Cookie Method (Recommended)
+Cookies are essential to be authenticated and access restricted videos. Youtube expects updated cookies and will raise errors when cookies are expired.
+
+There are several methods to enjoy cookies, depending of your HomeTube service configuration.
+
+### Browser Cookie Method
+
+Browser Cookie Method is recommended on a machine sharing directly a browser like a personal computer.
 
 1. **Select Browser**: Choose from Chrome, Firefox, Safari, Edge, etc.
 2. **Login Verification**: Ensure you're logged into YouTube in that browser
@@ -105,10 +111,14 @@ downloads/
 
 ### Cookie File Method
 
+Cookie File Method is recommended on machines without a browser such as a HomeLab.
+
 1. **Install Extension**: Use [Get cookies.txt](https://chrome.google.com/webstore/detail/get-cookiestxt/ekhagklcjbdpajgpjgmbionohlpdbjgc)
 2. **Export Cookies**: Visit YouTube and export cookies
 3. **Upload File**: Place in configured cookies directory
 4. **Automatic Detection**: Application loads cookies automatically
+
+The update can be done manually regularly or in case of error or automatically with some cron solutions.
 
 ### What Requires Authentication?
 
@@ -138,6 +148,28 @@ downloads/
 - Community contributions
 - YouTube auto-generated
 - Translated versions
+
+### ⚠️ Auto-Generated Subtitles Limitations
+
+**Important considerations for auto-generated subtitles:**
+
+Auto-generated subtitles have significant limitations that users should be aware of:
+
+- **Poor Formatting**: Auto-generated subtitles often lack proper sentence breaks and punctuation
+- **Readability Issues**: Text tends to stick together and chain in an illegible way
+- **Display Problems**: Most video players cannot properly format these subtitles for optimal reading
+- **YouTube Client Exception**: Only the official YouTube client can display auto-generated subtitles correctly
+
+**Our Approach**:
+- We keep the `write-auto-subs` option enabled by default
+- **Rationale**: Having imperfect subtitles is better than having no subtitles at all
+- **Recommendation**: Use manual or community-contributed subtitles when available for better quality
+
+**Best Practices**:
+1. **Check for manual subtitles first** - Look for creator-provided or community subtitles
+2. **Use auto-generated as fallback** - Only when no other options are available
+3. **Consider post-processing** - You may want to edit auto-generated subtitles for better readability
+4. **Test playback** - Verify subtitle quality in your preferred video player
 
 ### Audio Processing
 

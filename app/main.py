@@ -1783,20 +1783,26 @@ with st.expander(f"{t('quality_title')}", expanded=False):
 
 # Optional embedding section for chapter and subs
 with st.expander(f"{t('embedding_title')}", expanded=False):
-    # st.markdown(f"### {t('optional_cutting')}")
-
-    st.info(t("embedding_presentation"))
+    # === SUBTITLES SECTION ===
+    st.markdown(f"### {t('subtitles_section_title')}")
+    st.info(t("subtitles_info"))
 
     embed_subs = st.checkbox(
         t("embed_subs"),
         value=True,  # Checked by default
         key="embed_subs",
+        help=t("embed_subs_help"),
     )
+
+    # === CHAPTERS SECTION ===
+    st.markdown(f"### {t('chapters_section_title')}")
+    st.info(t("chapters_info"))
 
     embed_chapters = st.checkbox(
         t("embed_chapters"),
         value=True,
         key="embed_chapters",
+        help=t("embed_chapters_help"),
     )
 
 # === COOKIES MANAGEMENT ===
