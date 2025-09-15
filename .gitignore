@@ -1,0 +1,66 @@
+# Python-generated files
+.python-version
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+.envrc
+
+# Testing and coverage files
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+**Testing.ipynb
+
+# Backup files
+*.old
+*_OLD.*
+*_backup.*
+README_OLD.md
+Makefile.old
+
+# Streamlit configuration (keeping config.toml for consistent UI theme)
+# .streamlit/
+
+# Local download and temporary folders
+cookies/*
+downloads/*
+tmp/
+
+# Deployment scripts (may contain sensitive info)
+deploy.sh
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Docker volumes and data
+docker-volumes/
+data/

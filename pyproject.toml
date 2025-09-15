@@ -1,0 +1,89 @@
+[project]
+name = "hometube"
+version = "0.1.0"
+description = "HomeTube development workspace"
+requires-python = ">=3.10"
+dependencies = [
+    "black>=25.1.0",
+    "ruff>=0.13.0",
+    "streamlit>=1.49.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0", 
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.0",
+    "pytest-xdist>=3.8.0",
+]
+dev = [
+    "black>=23.0.0",
+    "ruff>=0.7.0",
+    "watchdog>=3.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
+exclude = ["tests*", "docs*", "tmp*", "cookies*", "downloads*", "htmlcov*"]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.0",
+    "pytest-xdist>=3.8.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "watchdog>=3.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--tb=short",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow tests",
+    "network: Tests requiring network access",
+    "performance: Performance tests",
+    "stress: Stress tests",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

@@ -1,0 +1,56 @@
+name: hometube
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python>=3.10
+  - pip
+  - ffmpeg  # Required for video processing
+  
+  # Development and testing dependencies via pip
+  - pip:
+    # === CORE DEPENDENCIES ===
+    - streamlit>=1.49.1
+    
+    # === TESTING DEPENDENCIES ===
+    # Essential for make test commands to work
+    - pytest>=8.4.2
+    - pytest-asyncio>=1.2.0
+    - pytest-cov>=7.0.0
+    - pytest-mock>=3.15.0
+    - pytest-xdist>=3.8.0
+    
+    # === DEVELOPMENT DEPENDENCIES ===
+    # Code quality and development tools
+    - black>=23.0.0
+    - flake8>=6.0.0
+    - mypy>=1.5.0
+    - watchdog>=3.0.0
+
+# === USAGE GUIDE ===
+#
+# 🚀 Quick Setup (Contributors):
+#   conda env create -f environment.yml
+#   conda activate hometube
+#   make test
+#   python run.py
+#
+# 🛠️ Full Development Setup:
+#   conda env create -f environment.yml  
+#   conda activate hometube
+#   make test-all
+#   python run.py
+#
+# 🔄 Alternative with Requirements Files:
+#   conda create -n hometube python>=3.10 ffmpeg
+#   conda activate hometube
+#   pip install -r requirements-dev.txt
+#
+# 📁 Environment Management:
+#   conda env update -f environment.yml     # Update existing environment
+#   conda env remove -n hometube          # Remove environment
+#   conda env export > environment.yml    # Export current environment
+#
+# 📝 Note: This environment.yml includes all dependencies for development.
+#         For production, use the Docker image or requirements.txt instead.
