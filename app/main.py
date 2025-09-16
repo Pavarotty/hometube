@@ -789,28 +789,88 @@ def fetch_sponsorblock_segments(
     api=SPONSORBLOCK_API,
     timeout=15,
 ):
-    vid = url_or_id if len(url_or_id) == 11 else video_id_from_url(url_or_id)
-    r = requests.get(
-        f"{api}/api/skipSegments",
-        params={"videoID": vid, "categories": json.dumps(list(categories))},
-        timeout=timeout,
-    )
+    """
+    Fetch SponsorBlock segments for a video.
 
-    # Handle 404 gracefully - it means no sponsor segments found
-    if r.status_code == 404:
+    Args:
+        url_or_id: Video URL or YouTube video ID
+        categories: Categories to fetch
+        api: SponsorBlock API endpoint
+        timeout: Request timeout
+
+    Returns:
+        List of segments or empty list if unavailable/error
+    """
+    try:
+        # Extract video ID - this will return empty string for non-YouTube URLs
+        vid = url_or_id if len(url_or_id) == 11 else video_id_from_url(url_or_id)
+
+        # If no valid YouTube video ID found, return empty list (not an error)
+        if not vid or len(vid) != 11:
+            return []
+
+        # Validate that the video ID contains only valid characters
+        if not vid.replace("-", "").replace("_", "").isalnum():
+            return []
+
+        r = requests.get(
+            f"{api}/api/skipSegments",
+            params={"videoID": vid, "categories": json.dumps(list(categories))},
+            timeout=timeout,
+        )
+
+        # Handle different status codes appropriately
+        if r.status_code == 404:
+            # No sponsor segments found for this video (normal case)
+            return []
+        elif r.status_code == 400:
+            # Bad request - likely invalid video ID format
+            return []
+        elif r.status_code == 403:
+            # Forbidden - video might be private or restricted
+            return []
+        elif r.status_code >= 500:
+            # Server error - SponsorBlock API issue
+            return []
+
+        r.raise_for_status()
+
+        # Parse response
+        raw = r.json()
+        if not isinstance(raw, list):
+            return []
+
+        segments = []
+        for x in raw:
+            try:
+                if isinstance(x, dict) and "segment" in x and "category" in x:
+                    segment_data = x["segment"]
+                    if isinstance(segment_data, list) and len(segment_data) >= 2:
+                        segments.append(
+                            {
+                                "start": float(segment_data[0]),
+                                "end": float(segment_data[1]),
+                                "category": x["category"],
+                            }
+                        )
+            except (ValueError, TypeError, KeyError):
+                # Skip malformed segment data
+                continue
+
+        return segments
+
+    except requests.exceptions.Timeout:
+        # Timeout - SponsorBlock API is slow
         return []
-
-    r.raise_for_status()
-    # Réponse: [{"segment":[start,end], "category": "...", ...}, ...]
-    raw = r.json()
-    return [
-        {
-            "start": float(x["segment"][0]),
-            "end": float(x["segment"][1]),
-            "category": x["category"],
-        }
-        for x in raw
-    ]
+    except requests.exceptions.ConnectionError:
+        # Network issues
+        return []
+    except requests.exceptions.RequestException:
+        # Other request errors
+        return []
+    except Exception:
+        # Any other unexpected error
+        return []
 
 
 # --- 3) Cleanup/sort/merge (optional) ---
@@ -899,6 +959,14 @@ def get_sponsorblock_segments(
     try:
         push_log(t("log_fetching_sponsorblock"))
 
+        # Check if this is a YouTube URL
+        from urllib.parse import urlparse
+
+        parsed_url = urlparse(url)
+        is_youtube = parsed_url.netloc.endswith(
+            "youtube.com"
+        ) or parsed_url.netloc.endswith("youtu.be")
+
         # Use specified categories or default ones
         if categories is None:
             categories = [
@@ -910,7 +978,7 @@ def get_sponsorblock_segments(
                 "preview",
             ]
 
-        # Use the new fetch function with specified categories
+        # Try to fetch segments regardless of platform
         segments = fetch_sponsorblock_segments(url, categories=categories)
 
         if segments:
@@ -948,7 +1016,20 @@ def get_sponsorblock_segments(
                     )
                 )
         else:
-            push_log(t("log_sponsorblock_no_data"))
+            # No segments found - provide context-appropriate message
+            if is_youtube:
+                video_id = video_id_from_url(url)
+                if video_id:
+                    push_log(t("log_sponsorblock_no_data"))
+                    push_log(
+                        "💡 This YouTube video has no community-submitted sponsor segments"
+                    )
+                else:
+                    push_log("⚠️ Could not extract valid YouTube video ID from URL")
+            else:
+                push_log("ℹ️ SponsorBlock data not available for this platform")
+                push_log(f"🔗 Platform: {parsed_url.netloc}")
+                push_log("💡 SponsorBlock is a YouTube-specific community database")
 
         return segments
 

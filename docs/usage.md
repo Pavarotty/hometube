@@ -118,7 +118,16 @@ Cookie File Method is recommended on machines without a browser such as a HomeLa
 3. **Upload File**: Place in configured cookies directory
 4. **Automatic Detection**: Application loads cookies automatically
 
-The update can be done manually regularly or in case of error or automatically with some cron solutions.
+### Update HomeLab Cookies
+
+For HomeLab setups not having a browser, we want to easily update cookies file. We can do it easily, manually, when it's necessary, from personal computer with :
+
+1. **Extract cookies** on your personal computer using "Get cookies.txt"
+2. **Sync on HomeLab** via rsync when necessary
+```bash
+# From your personal computer, sync cookies to your HomeLab
+rsync -avz ~/Downloads/cookies.txt user@homelab-ip:/path/to/hometube/cookies/
+```
 
 ### What Requires Authentication?
 
@@ -261,19 +270,18 @@ Auto-generated subtitles have significant limitations that users should be aware
 
 ## 📁 Advanced Features
 
-### Batch Processing
+### Playlist Support
 
-**Multiple URLs**:
-1. Enter URLs separated by newlines
-2. Apply same settings to all videos
-3. Monitor progress for each download
-4. Automatic retry on failures
+**YouTube Playlists**:
+- Entire playlist download automatically supported
+- Maintains playlist order
+- Individual video quality selection applies to all videos
+- Automatic folder organization by playlist name
 
-**Playlist Support**:
-- Entire playlist download
-- Selective video downloads
-- Maintain playlist order
-- Custom naming patterns
+**Channel Downloads**:
+- Channel URLs automatically download all available videos
+- Organized by channel/creator name
+- Respects upload order
 
 ### Custom Output Settings
 

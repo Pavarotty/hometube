@@ -24,8 +24,8 @@ RUN pip install --no-cache-dir --upgrade pip --break-system-packages
 # Copy source code
 COPY app/ ./app/
 
-# Install the package (yt-dlp and ffmpeg already available!)
-RUN pip install --no-cache-dir . --break-system-packages
+# Install the package with Docker-specific dependencies (excluding yt-dlp since it's already in base image)
+RUN pip install --no-cache-dir ".[docker]" --break-system-packages
 
 # Copy Streamlit configuration for consistent UI theme
 COPY .streamlit/ /app/.streamlit/
