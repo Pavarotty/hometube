@@ -394,10 +394,9 @@ git commit -m "feat: add awesome new feature
 git tag v1.2.0
 ```
 
-#### 9. Push Branch and Tag
+#### 9. Push feature branch
 ```bash
 git push origin feature/awesome-feature
-git push origin v1.2.0
 ```
 
 #### 10. Open a Pull Request
@@ -405,6 +404,15 @@ _Open a PR from your feature branch to `main` on GitHub._
 
 #### 11. Verify GitHub Actions
 _Check CI results for validation before merging._
+
+#### 12. Push Branch
+```bash
+git push origin v1.2.0
+```
+
+#### 13. Verify GitHub Actions
+_Check CI results for validation before merging._
+
 
 ### 3. Pull Request Guidelines
 

@@ -148,7 +148,6 @@ Transform your downloads with **powerful built-in video processing tools**:
 <br/>
 <br/>
 
----
 
 ## 🚀 Quick Start
 
