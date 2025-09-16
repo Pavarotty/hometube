@@ -48,7 +48,7 @@ TRANSLATIONS = {
     "cutting_mode_precise": "🎯 Précise",
     "cutting_mode_help": "Mode keyframes: beaucoup plus rapide mais découpe approximative aux keyframes. Mode précis: découpe exacte mais nécessite un réencodage complet.",
     "cutting_mode_keyframes_info": "⚡ Keyframes: Découpe aux keyframes les plus proches, sans réencodage. Très rapide, propre mais avec des coupes approximatives selon les keyframes.",
-    "cutting_mode_precise_info": "🎯 ⏳ Précise: Coupes exactes avec réencodage complet. Très lent, rendu incertain mais avec des coupes précises.",
+    "cutting_mode_precise_info": "⏳ &nbsp; Précise: Coupes exactes avec réencodage complet. Très lent, rendu incertain mais avec des coupes précises.",
     "start_time": "Début",
     "end_time": "Fin",
     "time_format_help": "Exemples: 11  •  0:11  •  00:00:11  •  1:02:03",

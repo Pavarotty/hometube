@@ -73,7 +73,9 @@ referencing==0.36.2
     #   jsonschema
     #   jsonschema-specifications
 requests==2.32.5
-    # via streamlit
+    # via
+    #   hometube (pyproject.toml)
+    #   streamlit
 rpds-py==0.27.1
     # via
     #   jsonschema

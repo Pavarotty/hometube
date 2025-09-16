@@ -8,7 +8,7 @@ from typing import Dict, Any
 
 def get_translations() -> Dict[str, Any]:
     """Get translations based on UI_LANGUAGE environment variable"""
-    language = os.getenv("UI_LANGUAGE", "fr").lower()
+    language = os.getenv("UI_LANGUAGE", "en").lower()
 
     if language == "en":
         from .en import TRANSLATIONS
