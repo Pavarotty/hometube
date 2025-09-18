@@ -1,16 +1,19 @@
 services:
   hometube:
-    image: ghcr.io/egalitarianmonkey/hometube:latest
-    # build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hometube:local
     container_name: hometube
     env_file: .env
     environment:
       - TZ=${TZ:-Europe/Paris}
     ports:
       - "${PORT:-8510}:8501"
-    # chemins "génériques" — valeurs par défaut utiles en dev
+
     volumes:
-      - "${VIDEOS_FOLDER_DOCKER_HOST:-./downloads}:/data/Videos"
+      - "${VIDEOS_FOLDER_DOCKER_HOST:-./downloads}:/app/downloads"
       - "${TMP_DOWNLOAD_FOLDER_DOCKER_HOST:-./tmp}:/data/tmp"
       - "${YOUTUBE_COOKIES_FILE_PATH_DOCKER_HOST:-./cookies/youtube_cookies.txt}:/config/youtube_cookies.txt"
+      - "${HOOKS_DIR_DOCKER_HOST:-./hooks}:/app/hooks:ro"
     restart: unless-stopped

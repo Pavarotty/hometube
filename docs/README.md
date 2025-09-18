@@ -18,6 +18,7 @@ Welcome to the Universal Video Downloader documentation! This index will guide y
 - **[Usage Guide](usage.md)** - Comprehensive feature documentation and tutorials
 - **[Supported Platforms](supported-platforms.md)** - Complete list of 1800+ supported video sources
 - **[Docker Guide](docker.md)** - Container deployment and configuration
+ - **[Download Hooks](hooks.md)** - Run commands on start/success/failure
 
 ### For System Administrators
 - **[Deployment Guide](deployment.md)** - Production deployment strategies

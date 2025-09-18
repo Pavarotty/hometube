@@ -9,7 +9,21 @@ from typing import Optional, Tuple, List, Dict
 from urllib.parse import urlparse, parse_qs
 
 import requests
-import streamlit as st
+
+import importlib
+import sys
+
+# Lazy import Streamlit to avoid static "could not resolve import" errors in editors/linters.
+# If Streamlit is not installed, print a helpful message and exit early.
+try:
+    st = importlib.import_module("streamlit")
+except Exception:
+    print(
+        "❌ Missing required dependency: 'streamlit'.\n"
+        "Install it with:\n\n    pip install streamlit\n\n"
+        "Then re-run this application."
+    )
+    raise SystemExit("Missing dependency: streamlit")
 
 try:
     from translations import t
@@ -584,6 +598,82 @@ def safe_push_log(message: str):
             print(f"[LOG] {message}")
     except Exception as e:
         print(f"[LOG] {message} (Error: {e})")
+
+
+# === HOOKS (START/SUCCESS/FAILURE) ===
+def _get_hook_env_name(event: str) -> str:
+    mapping = {
+        "start": "ON_DOWNLOAD_START",
+        "success": "ON_DOWNLOAD_SUCCESS",
+        "failure": "ON_DOWNLOAD_FAILURE",
+    }
+    return mapping.get(event, "")
+
+
+def _format_hook_command(template: str, context: dict) -> str:
+    """Format a hook command template using simple {PLACEHOLDER} mapping.
+
+    Available placeholders include: {URL}, {FILENAME}, {DEST_DIR}, {TMP_DIR},
+    {OUTPUT_PATH}, {STATUS}, {RUN_SEQ}, {TS} (unix epoch), {START_SEC}, {END_SEC}.
+    """
+    # Provide quoted variants for convenience ("..." with escaped quotes)
+    ctx = dict(context)
+    def q(v: str) -> str:
+        if v is None:
+            return ""
+        # Always wrap in double quotes and escape embedded ones
+        return '"' + str(v).replace('"', '\\"') + '"'
+
+    # Add *_Q variants
+    for key, val in list(ctx.items()):
+        ctx[f"{key}_Q"] = q(val)
+
+    try:
+        return template.format_map(ctx)
+    except Exception:
+        # If formatting fails, return original template so it can still run
+        return template
+
+
+def run_hook(event: str, context: dict, timeout: int = 30) -> None:
+    """Run a lifecycle hook if configured via env vars.
+
+    - event: one of 'start' | 'success' | 'failure'
+    - context: placeholders for formatting the command
+    """
+    env_name = _get_hook_env_name(event)
+    if not env_name:
+        return
+
+    cmd_template = os.getenv(env_name, "").strip()
+    if not cmd_template:
+        return
+
+    cmd = _format_hook_command(cmd_template, context)
+
+    safe_push_log(f"⚙️ Hook {event}: {cmd}")
+    try:
+        # Use shell=True to allow users to pass arbitrary commands/pipelines
+        # The underlying platform shell will be used (cmd/sh).
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+        if result.stdout:
+            for line in result.stdout.splitlines():
+                safe_push_log(f"[hook:{event}:out] {line}")
+        if result.stderr:
+            for line in result.stderr.splitlines():
+                safe_push_log(f"[hook:{event}:err] {line}")
+        if result.returncode != 0:
+            safe_push_log(f"⚠️ Hook '{event}' exited with code {result.returncode}")
+    except subprocess.TimeoutExpired:
+        safe_push_log(f"⚠️ Hook '{event}' timed out after {timeout}s")
+    except Exception as e:
+        safe_push_log(f"⚠️ Hook '{event}' error: {e}")
 
 
 def extract_resolution_value(resolution_str: str) -> int:
@@ -2461,6 +2551,24 @@ if submitted:
         clean_url,
     ]
 
+    # === HOOK: START ===
+    try:
+        hook_ctx = {
+            "URL": clean_url,
+            "FILENAME": base_output,
+            "DEST_DIR": str(dest_dir),
+            "TMP_DIR": str(tmp_subfolder_dir),
+            "OUTPUT_PATH": "",
+            "STATUS": "start",
+            "RUN_SEQ": str(st.session_state.get("run_seq", 0)),
+            "TS": str(int(time.time())),
+            "START_SEC": str(start_sec if start_sec is not None else ""),
+            "END_SEC": str(end_sec if end_sec is not None else ""),
+        }
+        run_hook("start", hook_ctx)
+    except Exception as _e:
+        safe_push_log(f"⚠️ Could not run start hook: {_e}")
+
     progress_placeholder.progress(0, text=t("status_preparation"))
     status_placeholder.info(t("status_downloading_simple"))
     ret_dl = run_cmd(
@@ -2476,6 +2584,16 @@ if submitted:
         cleanup_temp_files(base_output, tmp_subfolder_dir)
         status_placeholder.success(t("cleanup_complete"))
 
+        # HOOK: FAILURE (cancelled)
+        try:
+            hook_ctx.update({
+                "STATUS": "cancelled",
+                "TS": str(int(time.time())),
+            })
+            run_hook("failure", hook_ctx)
+        except Exception as _e:
+            safe_push_log(f"⚠️ Could not run failure hook: {_e}")
+
         # Mark download as finished
         st.session_state.download_finished = True
         st.stop()
@@ -2490,6 +2608,15 @@ if submitted:
 
     if not final_tmp:
         status_placeholder.error(t("error_download_failed"))
+        # HOOK: FAILURE (download_failed)
+        try:
+            hook_ctx.update({
+                "STATUS": "download_failed",
+                "TS": str(int(time.time())),
+            })
+            run_hook("failure", hook_ctx)
+        except Exception as _e:
+            safe_push_log(f"⚠️ Could not run failure hook: {_e}")
         st.stop()
 
     # === Post-processing according to scenario ===
@@ -2782,15 +2909,43 @@ if submitted:
                 cleanup_temp_files(base_output, tmp_subfolder_dir)
                 status_placeholder.success(t("cleanup_complete"))
 
+                # HOOK: FAILURE (cancelled during cut)
+                try:
+                    hook_ctx.update({
+                        "STATUS": "cancelled",
+                        "TS": str(int(time.time())),
+                    })
+                    run_hook("failure", hook_ctx)
+                except Exception as _e:
+                    safe_push_log(f"⚠️ Could not run failure hook: {_e}")
+
                 # Mark download as finished
                 st.session_state.download_finished = True
                 st.stop()
 
             if ret_cut != 0 or not cut_output.exists():
                 status_placeholder.error(t("error_ffmpeg_cut_failed"))
+                # HOOK: FAILURE (cut_failed)
+                try:
+                    hook_ctx.update({
+                        "STATUS": "cut_failed",
+                        "TS": str(int(time.time())),
+                    })
+                    run_hook("failure", hook_ctx)
+                except Exception as _e:
+                    safe_push_log(f"⚠️ Could not run failure hook: {_e}")
                 st.stop()
         except Exception as e:
             st.error(t("error_ffmpeg", error=e))
+            # HOOK: FAILURE (ffmpeg_exception)
+            try:
+                hook_ctx.update({
+                    "STATUS": "ffmpeg_exception",
+                    "TS": str(int(time.time())),
+                })
+                run_hook("failure", hook_ctx)
+            except Exception as _e:
+                safe_push_log(f"⚠️ Could not run failure hook: {_e}")
             st.stop()
 
         # Rename the cut file to the final name (without _cut suffix)
@@ -2828,8 +2983,28 @@ if submitted:
 
         status_placeholder.success(t("status_file_ready", subfolder=display_path))
         st.toast(t("toast_download_completed"), icon="✅")
+
+        # HOOK: SUCCESS
+        try:
+            hook_ctx.update({
+                "STATUS": "success",
+                "OUTPUT_PATH": str(final_moved),
+                "TS": str(int(time.time())),
+            })
+            run_hook("success", hook_ctx)
+        except Exception as _e:
+            safe_push_log(f"⚠️ Could not run success hook: {_e}")
     except Exception:
         status_placeholder.warning(t("warning_file_not_found"))
+        # HOOK: FAILURE (move_failed)
+        try:
+            hook_ctx.update({
+                "STATUS": "move_failed",
+                "TS": str(int(time.time())),
+            })
+            run_hook("failure", hook_ctx)
+        except Exception as _e:
+            safe_push_log(f"⚠️ Could not run failure hook: {_e}")
 
     # Mark download as finished
     st.session_state.download_finished = True
