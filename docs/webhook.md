@@ -1,51 +1,51 @@
 # Webhook API (Same Port)
 
-HomeTube espone un endpoint HTTP POST sulla stessa porta del server Streamlit per ricevere dati esterni e popolare automaticamente i campi della UI (es. l'URL del video).
+HomeTube exposes an HTTP POST endpoint on the same port as the Streamlit server to receive external data and automatically populate UI fields (e.g. the video URL).
 
 - Endpoint: `POST /webhook`
-- Porta: la stessa della UI (nessuna porta aggiuntiva)
-- Abilitazione: `ENABLE_WEBHOOK=1` (default)
+- Port: the same as the UI (no additional port)
+- Enable: `ENABLE_WEBHOOK=1` (default)
 
 ## Payload
 
-Accetta JSON (consigliato) o form-url-encoded. Campi riconosciuti:
-- `url` (o `URL`): link del video da inserire nel campo URL della UI
-- `filename` (o `name`): nome file proposto nel campo "Video name"
+Accepts JSON (recommended) or form-url-encoded. Recognized fields:
+- `url` (or `URL`): video link to populate the UI URL field
+- `filename` (or `name`): proposed file name for the "Video name" field
 
-Esempio JSON:
+Example JSON:
 ```json
 {
-  "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-  "filename": "My Video"
+    "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "filename": "My Video"
 }
 ```
 
-## Esempi
+## Examples
 
 ```bash
 curl -sS -X POST http://localhost:8501/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"url":"https://youtu.be/dQw4w9WgXcQ","filename":"My Video"}'
+    -H "Content-Type: application/json" \
+    -d '{"url":"https://youtu.be/dQw4w9WgXcQ","filename":"My Video"}'
 ```
 
-Con form-url-encoded:
+With form-url-encoded:
 ```bash
 curl -sS -X POST http://localhost:8501/webhook \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "url=https://youtu.be/dQw4w9WgXcQ&filename=My+Video"
+    -H "Content-Type: application/x-www-form-urlencoded" \
+    -d "url=https://youtu.be/dQw4w9WgXcQ&filename=My+Video"
 ```
 
-Risposta:
+Response:
 ```json
 {"ok": true, "received": {"url": "...", "filename": "..."}}
 ```
 
-## Sicurezza
+## Security
 
-- L'endpoint è aperto in locale per semplicità. Se esposto in rete, proteggilo con un reverse proxy, rete fidata o token custom.
-- Per disabilitare completamente: `ENABLE_WEBHOOK=0`.
+- The endpoint is left open locally for simplicity. If exposed to the network, protect it with a reverse proxy, trusted network, or custom token.
+- To disable completely: `ENABLE_WEBHOOK=0`.
 
-## Note
+## Notes
 
-- L'UI applica i dati del webhook al prossimo rerun (Streamlit ricalcola spesso). Dopo la POST, la barra URL si riempirà automaticamente.
-- In Docker, l'endpoint è accessibile sulla stessa porta mappata (es. `http://localhost:8501/webhook`).
+- The UI applies webhook data on the next rerun (Streamlit reruns frequently). After the POST, the URL field will be filled automatically.
+- In Docker, the endpoint is accessible on the same mapped port (e.g. `http://localhost:8501/webhook`).

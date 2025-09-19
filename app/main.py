@@ -5,14 +5,13 @@ import subprocess
 import json
 import time
 import threading
+import importlib
+import sys
 from pathlib import Path
 from typing import Optional, Tuple, List, Dict
 from urllib.parse import urlparse, parse_qs
 
 import requests
-
-import importlib
-import sys
 
 # Lazy import Streamlit to avoid static "could not resolve import" errors in editors/linters.
 # If Streamlit is not installed, print a helpful message and exit early.
@@ -29,10 +28,10 @@ except Exception:
 # Try importing Streamlit server and Tornado for custom endpoints
 try:
     try:
-        from streamlit.web.server.server import Server  # streamlit >= 1.18
+        from streamlit.web.server.server import Server  # streamlit >= 1.18 # type: ignore
     except Exception:
-        from streamlit.server.server import Server  # older versions
-    import tornado.web
+        from streamlit.server.server import Server  # older versions # type: ignore
+    import tornado.web 
 except Exception:
     Server = None  # type: ignore
     tornado = None  # type: ignore
@@ -43,11 +42,7 @@ except ImportError:
     # Fallback for when running from app directory
     from .translations import t
 
-
 # === CONSTANTS ===
-# Webhook configuration - always enabled
-ENABLE_WEBHOOK = True
-DEBUG_WEBHOOK = True
 
 SPONSORBLOCK_API = "https://sponsor.ajay.app"
 DEFAULT_SUBTITLE_LANGUAGES = ["en", "fr"]
@@ -93,7 +88,6 @@ LOGS_CONTAINER_STYLE = """
     white-space: pre-wrap;
     border: 1px solid #262730;
 """
-
 
 # === LOAD .env FILE ===
 def load_env_file():
@@ -145,17 +139,6 @@ def load_env_file():
 
 # Load .env file before using environment variables
 load_env_file()
-
-# === STARTUP DEBUG ===
-startup_debug_file = Path("/data/tmp/startup_debug.log")
-try:
-    with open(startup_debug_file, "w") as f:
-        f.write(f"=== STARTUP {time.time()} ===\n")
-        f.write("✅ Module loading started\n")
-        f.flush()
-    print("✅ Module loading started - debug file created")
-except Exception as e:
-    print(f"❌ Could not create startup debug file: {e}")
 
 # === ENV ===
 # Determine the project root for robust default paths
@@ -218,7 +201,6 @@ if not SUBTITLES_CHOICES:
     SUBTITLES_CHOICES = DEFAULT_SUBTITLE_LANGUAGES
     print("⚠️ No valid subtitle languages found, using defaults:", SUBTITLES_CHOICES)
 
-
 # === CONFIGURATION SUMMARY ===
 def print_config_summary():
     """Print a summary of the current configuration for debugging"""
@@ -253,11 +235,9 @@ def print_config_summary():
 
     print()
 
-
 # Print configuration summary in development mode
 if __name__ == "__main__" or os.getenv("DEBUG"):
     print_config_summary()
-
 
 # === UTILITY FUNCTIONS ===
 def is_valid_cookie_file(file_path: Optional[str]) -> bool:
@@ -272,13 +252,11 @@ def is_valid_cookie_file(file_path: Optional[str]) -> bool:
     except (OSError, TypeError):
         return False
 
-
 def is_valid_browser(browser_name: str) -> bool:
     """Check if browser name is supported"""
     if not browser_name:
         return False
     return browser_name.lower().strip() in SUPPORTED_BROWSERS
-
 
 # === UI CFG ===
 st.set_page_config(page_title=t("page_title"), page_icon="🎬", layout="centered")
@@ -286,13 +264,12 @@ st.markdown(
     f"<h1 style='text-align: center;'>{t('page_header')}</h1>", unsafe_allow_html=True
 )
 
-# === WEBHOOK ENDPOINT (same Streamlit server) ===
+# === WEBHOOK ENDPOINT ===
 # Store last webhook payload to be consumed by the UI
 WEBHOOK_STATE = {"ts": 0.0, "data": {}}
 WEBHOOK_LOCK = threading.Lock()
 WEBHOOK_ROUTE_REGISTERED = False
 WEBHOOK_REG_THREAD_STARTED = False
-
 
 def _register_webhook_endpoint_once():
     global WEBHOOK_ROUTE_REGISTERED
@@ -436,8 +413,8 @@ def _register_webhook_endpoint_once():
         WEBHOOK_ROUTE_REGISTERED = True
         _log_early("✅ Webhook endpoint registered at /webhook")
     except Exception as e:
-        _log_early(f"⚠️ Webhook registration failed: {e}")
-
+        # _log_early(f"⚠️ Webhook registration failed: {e}")
+        pass
 
 def _start_webhook_registrar_thread():
     global WEBHOOK_REG_THREAD_STARTED
@@ -461,8 +438,9 @@ def _start_webhook_registrar_thread():
     th = threading.Thread(target=_runner, name="webhook-registrar", daemon=True)
     th.start()
 
-
 # Start webhook system if enabled
+ENABLE_WEBHOOK = os.getenv("ENABLE_WEBHOOK", "0").strip().lower() in ("1", "true", "yes", "on")
+
 if ENABLE_WEBHOOK:
     _start_webhook_registrar_thread()
 
@@ -472,9 +450,7 @@ if "run_seq" not in st.session_state:
 
 # Initialize cancel and download state variables
 if "download_finished" not in st.session_state:
-    st.session_state.download_finished = (
-        True  # True by default (no download in progress)
-    )
+    st.session_state.download_finished = True  # True by default (no download in progress)
 if "download_cancelled" not in st.session_state:
     st.session_state.download_cancelled = False
 if "qp_applied" not in st.session_state:
@@ -493,13 +469,14 @@ def _apply_webhook_to_session():
             updated = False
             url_in = data.get("url")
             if url_in:
-                # Set the session key used by the URL text_input
                 st.session_state["main_url"] = sanitize_url(str(url_in))
                 updated = True
+            
             filename_in = data.get("filename")
             if filename_in is not None:
                 st.session_state["main_filename"] = sanitize_filename(str(filename_in))
                 updated = True
+            
             if updated:
                 st.session_state.last_seen_webhook_ts = float(ts)
                 safe_push_log(f"🌐 Applied webhook data to UI fields: url={url_in!r} filename={filename_in!r}")
@@ -509,46 +486,18 @@ def _apply_webhook_to_session():
 
 def _apply_query_params_to_session():
     """Populate URL/filename from query parameters (GET ?url=...&filename=...)."""
-    # File-based debug logging
-    debug_file = Path("/data/tmp/debug_webhook.log")
     try:
-        with open(debug_file, "a") as f:
-            f.write(f"\n=== {time.time()} ===\n")
-            f.write("🔍 DEBUG: Starting query params application\n")
-            f.flush()
-        
-        print("🔍 DEBUG: Starting query params application")
         params = {}
         
         # Use only old API to avoid conflicts
         try:
             qp_old = st.experimental_get_query_params()
             if qp_old:
-                msg = f"🔍 DEBUG: Found old query_params: {qp_old}"
-                print(msg)
-                with open(debug_file, "a") as f:
-                    f.write(f"{msg}\n")
-                    f.flush()
                 for k in ("url", "URL", "filename", "name", "q"):
                     if k in qp_old:
                         params[k] = qp_old[k]
-                        msg = f"🔍 DEBUG: Added old param {k}={qp_old[k]}"
-                        print(msg)
-                        with open(debug_file, "a") as f:
-                            f.write(f"{msg}\n")
-                            f.flush()
-        except Exception as e:
-            msg = f"🔍 DEBUG: Old API failed: {e}"
-            print(msg)
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                f.flush()
-
-        msg = f"🔍 DEBUG: Final params: {params}"
-        print(msg)
-        with open(debug_file, "a") as f:
-            f.write(f"{msg}\n")
-            f.flush()
+        except Exception:
+            pass
 
         def one(v):
             if isinstance(v, list):
@@ -557,12 +506,6 @@ def _apply_query_params_to_session():
 
         url_in = one(params.get("url") or params.get("URL") or params.get("q"))
         fname_in = one(params.get("filename") or params.get("name"))
-        
-        msg = f"🔍 DEBUG: Extracted url_in={url_in!r} fname_in={fname_in!r}"
-        print(msg)
-        with open(debug_file, "a") as f:
-            f.write(f"{msg}\n")
-            f.flush()
 
         # Prevent infinite reruns
         if "qp_applied" not in st.session_state:
@@ -570,73 +513,26 @@ def _apply_query_params_to_session():
 
         updated = False
         if url_in:
-            old_url = st.session_state.get("main_url", "")
             new_url = sanitize_url(str(url_in))
             st.session_state["main_url"] = new_url
-            msg = f"🔍 DEBUG: Set main_url from '{old_url}' to '{new_url}'"
-            print(msg)
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                f.flush()
             updated = True
         if fname_in is not None:
-            old_fname = st.session_state.get("main_filename", "")
             new_fname = sanitize_filename(str(fname_in))
             st.session_state["main_filename"] = new_fname
-            msg = f"🔍 DEBUG: Set main_filename from '{old_fname}' to '{new_fname}'"
-            print(msg)
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                f.flush()
             updated = True
             
         if updated:
-            msg = f"🌐 Applied query params to UI fields: url={url_in!r} filename={fname_in!r}"
-            print(msg)
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                f.flush()
-            msg = f"🔍 DEBUG: Current session_state main_url: {st.session_state.get('main_url')}"
-            print(msg)
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                f.flush()
-            try:
-                safe_push_log(f"🌐 Applied query params to UI fields: url={url_in!r} filename={fname_in!r}")
-            except Exception:
-                pass
             if not st.session_state.qp_applied:
                 st.session_state.qp_applied = True
-                msg = "🔍 DEBUG: Triggering rerun"
-                print(msg)
-                with open(debug_file, "a") as f:
-                    f.write(f"{msg}\n")
-                    f.flush()
                 try:
                     st.experimental_rerun()
-                except Exception as e:
-                    msg = f"🔍 DEBUG: Rerun failed: {e}"
-                    print(msg)
-                    with open(debug_file, "a") as f:
-                        f.write(f"{msg}\n")
-                        f.flush()
-        else:
-            msg = "🔍 DEBUG: No query params to apply"
-            print(msg)
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                f.flush()
-    except Exception as e:
-        msg = f"⚠️ Could not apply query params: {e}"
-        print(msg)
-        try:
-            with open(debug_file, "a") as f:
-                f.write(f"{msg}\n")
-                import traceback
-                f.write(f"🔍 DEBUG: Full traceback: {traceback.format_exc()}\n")
-                f.flush()
-        except Exception:
-            pass
+                except Exception:
+                    try:
+                        st.rerun()
+                    except Exception:
+                        pass
+    except Exception:
+        pass
 
 
 # === Helpers FS ===
@@ -1839,21 +1735,6 @@ def parse_generic_percentage(line: str) -> Optional[float]:
 
 st.markdown("\n")
 
-# === DEBUG INFO ===
-if DEBUG_WEBHOOK:
-    st.write("**DEBUG INFO:**")
-    try:
-        qp_old = st.experimental_get_query_params()
-        st.write(f"Query params (old API): {qp_old}")
-    except Exception as e:
-        st.write(f"Query params (old API): Error - {e}")
-    st.write(f"Session state main_url: {st.session_state.get('main_url', 'NOT_SET')}")
-    st.write(f"Session state main_filename: {st.session_state.get('main_filename', 'NOT_SET')}")
-    st.write(f"Session state qp_applied: {st.session_state.get('qp_applied', 'NOT_SET')}")
-    with WEBHOOK_LOCK:
-        webhook_data = dict(WEBHOOK_STATE.get("data", {}) or {})
-    st.write(f"Webhook state: {webhook_data}")
-
 # === MAIN INPUTS (OUTSIDE FORM FOR DYNAMIC BEHAVIOR) ===
 # Apply any pending webhook data before rendering inputs
 try:
@@ -1866,23 +1747,7 @@ except Exception:
 
 _apply_webhook_to_session()
 
-try:
-    with open(Path("/data/tmp/startup_debug.log"), "a") as f:
-        f.write("🔍 About to apply query params to session\n")
-        f.flush()
-    print("🔍 DEBUG: About to apply query params to session")
-except Exception:
-    pass
-
 _apply_query_params_to_session()
-
-try:
-    with open(Path("/data/tmp/startup_debug.log"), "a") as f:
-        f.write(f"🔍 About to render text_input with value={st.session_state.get('main_url', '')}\n")
-        f.flush()
-    print(f"🔍 DEBUG: About to render text_input with value={st.session_state.get('main_url', '')}")
-except Exception:
-    pass
 
 url = st.text_input(
     t("video_url"),
@@ -1891,7 +1756,6 @@ url = st.text_input(
     key="url_input",
 )
 
-# Sync the url value back to session state for consistency
 if url != st.session_state.get("main_url", ""):
     st.session_state["main_url"] = url
 
