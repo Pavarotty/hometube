@@ -112,9 +112,9 @@ def main():
         success = run_command(cmd, description)
         results.append((description, success))
 
-    # Résumé final
+    # Final summary
     print("\n" + "=" * 80)
-    print("📊 RÉSUMÉ DES TESTS")
+    print("📊 TEST SUMMARY")
     print("=" * 80)
 
     success_count = 0

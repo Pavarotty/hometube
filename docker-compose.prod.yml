@@ -1,6 +1,6 @@
 version: "3.8"
 
-# Configuration pour utiliser l'image GitHub Container Registry en production
+# Configuration to use GitHub Container Registry image in production
 services:
   hometube:
     image: ghcr.io/EgalitarianMonkey/hometube:latest
@@ -8,7 +8,7 @@ services:
     ports:
       - "8501:8501"
     volumes:
-      # Volumes de production avec chemins absolus recommandés
+      # Production volumes with recommended absolute paths
       - /data/videos:/data/Videos
       - /data/tmp:/data/tmp
       - /config/cookies:/config
@@ -20,7 +20,7 @@ services:
       - STREAMLIT_BROWSER_GATHER_USAGE_STATS=false
     restart: unless-stopped
 
-    # Limites de ressources pour la production
+    # Resource limits for production
     deploy:
       resources:
         limits:
@@ -30,7 +30,7 @@ services:
           cpus: "1.0"
           memory: 1G
 
-    # Santé du conteneur
+    # Container health check
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
       interval: 30s
