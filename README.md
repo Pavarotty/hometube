@@ -2,21 +2,20 @@
 
 <br/>
 
-# 🎬 HomeTube
+# 🎬 HomeTube Hooked 🎣
 
 <br/>
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.49+-red.svg)](https://streamlit.io)
-[![Latest Release](https://img.shields.io/github/v/release/EgalitarianMonkey/hometube)](https://github.com/EgalitarianMonkey/hometube/releases)
-[![Docker Image](https://ghcr-badge.egpl.dev/egalitarianmonkey/hometube/latest_tag?trim=major&label=Docker)](https://github.com/EgalitarianMonkey/hometube/pkgs/container/hometube)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-green.svg)](LICENSE)
 
 <br/>
 
-**🌐 Universal Video Downloader for your HomeLab**
+**🌐 Universal Video Downloader with Webhook Integration**
 
-*Download, process and organize videos at Home*
+*Enhanced fork with automation hooks and webhook support*
 
 <br/>
 
@@ -27,24 +26,38 @@
 
 <!-- --- -->
 
-<!-- ## 🎯 What is HomeTube? -->
+<!-- ## 🎯 What is HomeTube Enhanced? -->
 
+🎬 **HomeTube Enhanced** is an advanced fork of the original HomeTube project, featuring powerful automation capabilities through **webhooks** and **lifecycle hooks**. Download, process and organize videos with seamless integration into your existing workflows and tools.
 
-🎬 HomeTube is a simple web UI for downloading single videos from the internet with the highest quality available and moving them to specific local locations automatically managed and integrated by media server such as Plex or Jellyfin.
+Perfect for automated video processing pipelines, media server integration, and custom workflow automation.
 
-A simple friendly solution for easily integrating preferred videos from Youtube and others platforms to local media server.
+### 🚀 **Enhanced Features**
 
-### 🏠 **HomeLab Integration**
-- **🎬 Media server Ready**: Download best quality videos with explicit name and location directly in your HomeLab media server structure and get automatic watch experience on Plex, Jellyfin, Emby or even on your PC
-- **📱 Network Access**: Web interface videos download accessible from any device on your network
+#### 🔗 **Webhook Integration** *(NEW)*
+- **📡 HTTP API**: Trigger downloads via `POST /webhook` endpoint
+- **🌐 URL Auto-fill**: Browser-compatible query parameters (`?url=...&filename=...`)
+- **🔄 Real-time Updates**: Automatic UI synchronization
+- **🛡️ CORS Support**: Cross-origin requests enabled
 
-### ⚡ **Features**
+#### ⚙️ **Lifecycle Hooks** *(NEW)*
+- **🎬 Download Start**: Execute custom scripts when download begins
+- **✅ Success Actions**: Automated post-processing on completion  
+- **❌ Failure Handling**: Custom error recovery workflows
+- **🔧 Shell Integration**: Full shell command execution with variable substitution
+
+#### 🏠 **HomeLab Integration**
+- **🎬 Media Server Ready**: Direct integration with Plex, Jellyfin, Emby
+- **📱 Network Access**: Web interface accessible from any device
+- **🤖 Automation Ready**: Perfect for Home Assistant, n8n, Zapier workflows
+
+### ⚡ **Core Features**
 - **🎯 One-Click Downloads**: Paste URL → Get perfectly organized video
-- **🚫 Ad-Free Content**: Block videos' sponsors and ads
+- **🚫 Ad-Free Content**: SponsorBlock integration for automatic ad removal
 - **🎬 Advanced Processing**: Cut clips, embed subtitles, convert formats
-- **🔐 Unlock restricted videos**: Cookies support for member-only videos, restricted age, etc.
+- **🔐 Unlock Restricted Videos**: Cookie authentication for member-only content
 - **📊 Quality Control**: Auto-select best quality or manual override
-- **🎥 Video Sources**: **YouTube**, Reddit, Vimeo, Dailymotion, TikTok, Twitch, Facebook, Instagra, etc. [See complete list (1800+)](docs/supported-platforms.md)
+- **🎥 1800+ Video Sources**: YouTube, Reddit, Vimeo, Dailymotion, TikTok, Twitch, and more
 
 <!-- ## ⚡ Technical Highlights
 
@@ -70,7 +83,53 @@ A simple friendly solution for easily integrating preferred videos from Youtube 
 
 <!-- --- -->
 
-## 🛠️ HomeTube Options
+## � Enhanced Automation Features
+
+### 🔗 Webhook Integration
+
+**Remote download triggering via HTTP API**:
+
+```bash
+# Trigger download via webhook
+curl -X POST http://localhost:8501/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://youtube.com/watch?v=example", "filename": "My Video"}'
+
+# Browser-compatible URL auto-fill
+http://localhost:8501/?url=https://youtube.com/watch?v=example&filename=My%20Video
+```
+
+**Perfect for automation tools**:
+- **🏠 Home Assistant**: Trigger downloads from automations
+- **🔗 n8n/Zapier**: Integrate with workflow automation
+- **📱 Shortcuts/Tasker**: Mobile app integration
+- **🤖 Custom Scripts**: API integration for any programming language
+
+### ⚙️ Lifecycle Hooks
+
+**Execute custom scripts at different download stages**:
+
+```bash
+# Environment variables for hooks
+ON_DOWNLOAD_START="echo 'Started: {URL}' >> /data/logs/downloads.log"
+ON_DOWNLOAD_SUCCESS="chmod 644 '{OUTPUT_PATH}' && notify-send 'Download Complete'"
+ON_DOWNLOAD_FAILURE="echo 'Failed: {URL} - {STATUS}' >> /data/logs/errors.log"
+```
+
+**Available variables**:
+- `{URL}` - Video URL
+- `{FILENAME}` - Output filename  
+- `{OUTPUT_PATH}` - Full path to downloaded file
+- `{STATUS}` - Download status
+- `{START_SEC}`, `{END_SEC}` - Section timestamps (if used)
+
+**Use cases**:
+- **📧 Notifications**: Email/Slack alerts on completion
+- **🔧 Post-processing**: Automatic transcoding, thumbnail generation
+- **📊 Logging**: Custom analytics and monitoring
+- **🔄 Workflow Integration**: Trigger next steps in your pipeline
+
+## �🛠️ HomeTube Options
 
 ### 🏠 HomeLab Integration
 
@@ -154,20 +213,20 @@ Transform your downloads with **powerful built-in video processing tools**:
 
 ### ⚙️ Essential Configuration
 
-**📋 HomeTube uses a `.env` file for all configuration**. This file controls download paths, authentication, subtitles, and more.
+**📋 HomeTube Enhanced uses a `.env` file for all configuration**. This includes webhook settings, lifecycle hooks, download paths, and authentication.
 
 ```bash
-# 1. Clone repository (if not already done)
-git clone https://github.com/EgalitarianMonkey/hometube.git
-cd hometube
+# 1. Clone repository
+git clone https://github.com/Pavarotty/hometube-personal.git
+cd hometube-personal
 
 # 2. Create your configuration file
 cp .env.sample .env
 
 # 3. Edit .env to customize your setup
 # - Set VIDEOS_FOLDER for download location
-# - Configure YOUTUBE_COOKIES_FILE_PATH for authentication
-# - Customize SUBTITLES_CHOICES for your languages
+# - Configure webhook and hook settings
+# - Set up authentication and subtitles
 ```
 
 💡 **The `.env` file will be automatically created from `.env.sample` on first run if missing!**
@@ -175,14 +234,16 @@ cp .env.sample .env
 ### 🐳 Docker (Recommended)
 
 ```bash
-# Simple deployment
+# Enhanced deployment with webhook support
 docker run -p 8501:8501 \
   -e TZ=Europe/Paris \
   -v ./downloads:/data/Videos \
   -v ./cookies:/config \
-  ghcr.io/egalitarianmonkey/hometube:latest
+  -v ./hooks:/app/hooks:ro \
+  pavarotty/hometube:latest
 
 # Access at http://localhost:8501
+# Webhook endpoint: http://localhost:8501/webhook
 ```
 
 ### 🐳 Docker Compose
@@ -192,15 +253,21 @@ docker run -p 8501:8501 \
 version: '3.8'
 services:
   hometube:
-    image: ghcr.io/egalitarianmonkey/hometube:latest
+    image: pavarotty/hometube:latest
     ports:
       - "8501:8501"
     environment:
       - TZ=Europe/Paris      # Configure timezone
       - PORT=8501            # Web interface port
+      # Webhook hooks (optional)
+      - ON_DOWNLOAD_START=echo "Started: {URL}" >> /data/logs/downloads.log
+      - ON_DOWNLOAD_SUCCESS=notify-send "Download Complete: {FILENAME}"
+      - ON_DOWNLOAD_FAILURE=echo "Failed: {STATUS}" >> /data/logs/errors.log
     volumes:
       - ./downloads:/data/Videos    # Downloads folder
       - ./cookies:/config           # Cookies folder
+      - ./hooks:/app/hooks:ro       # Custom hook scripts
+      - ./logs:/data/logs           # Log files
     restart: unless-stopped
 ```
 
@@ -209,6 +276,24 @@ services:
 docker-compose up -d
 
 # Access at http://localhost:8501
+# Webhook endpoint: http://localhost:8501/webhook
+```
+
+### 🔗 Webhook Configuration Example
+
+Create a `.env` file with webhook automation:
+
+```bash
+# Webhook hooks for automation
+ON_DOWNLOAD_START=echo "$(date): START {URL}" >> /data/logs/download.log
+ON_DOWNLOAD_SUCCESS=chmod 644 "{OUTPUT_PATH}" && echo "$(date): SUCCESS {OUTPUT_PATH}" >> /data/logs/download.log
+ON_DOWNLOAD_FAILURE=echo "$(date): FAILED {URL} - {STATUS}" >> /data/logs/download.log
+
+# Example: Plex library refresh after download
+ON_DOWNLOAD_SUCCESS=curl -X POST "http://plex:32400/library/sections/1/refresh?X-Plex-Token=YOUR_TOKEN"
+
+# Example: Home Assistant notification
+ON_DOWNLOAD_SUCCESS=curl -X POST "http://homeassistant:8123/api/services/notify/mobile_app_phone" -H "Authorization: Bearer YOUR_TOKEN" -d '{"message":"Video downloaded: {FILENAME}"}'
 ```
 
 ### 🏠 Local Installation
@@ -339,43 +424,73 @@ Expected output:
 
 ## 📈 Project Status
 
-- ✅ **Stable**: Core functionality tested and reliable
-- 🔄 **Active Development**: Regular updates and improvements
-- 🧪 **Test Coverage**: 84% on testable modules ([details](docs/testing.md))
-- 📦 **Production Ready**: Docker images available on GHCR
-- 🏠 **HomeLab Optimized**: Designed for self-hosted environments
+- ✅ **Enhanced Fork**: Based on the original HomeTube with automation improvements
+- 🔄 **Active Development**: Focused on webhook integration and automation features
+- 🧪 **Well Tested**: Core functionality tested and reliable
+- 📦 **Production Ready**: Docker images available on Docker Hub
+- 🏠 **HomeLab Optimized**: Designed for automated self-hosted environments
+- 🤖 **Automation Ready**: Perfect for Home Assistant, n8n, and custom workflows
 
-## 📆 Coming Features
+## � Original Project
 
-Check out the roadmap for upcoming features and enhancements:
+This is an enhanced fork of the original [HomeTube project](https://github.com/EgalitarianMonkey/hometube) by EgalitarianMonkey.
 
-**📋 See the complete roadmap**: [todo.md](todo.md)
+**🆕 What's New in This Fork:**
+- **🔗 Webhook API**: HTTP endpoint for remote download triggering
+- **⚙️ Lifecycle Hooks**: Custom script execution at download stages
+- **🌐 Browser Integration**: URL auto-fill via query parameters
+- **🤖 Automation Ready**: Perfect for Home Assistant and workflow tools
+
+**💝 Credits**: Huge thanks to [EgalitarianMonkey](https://github.com/EgalitarianMonkey) for creating the amazing foundation that made these enhancements possible.
+
+## � Enhanced Features Roadmap
+
+**Current enhancements:**
+- ✅ Webhook endpoint implementation
+- ✅ Lifecycle hooks system
+- ✅ Browser query parameter support
+- ✅ CORS and cross-origin request support
+
+**Planned improvements:**
+- 🔄 Advanced webhook authentication
+- 🔄 Batch download via webhook
+- 🔄 Real-time download progress API
+- 🔄 Enhanced hook variable substitution
 
 ---
 
 ## 🤝 Contributing & Development
 
-**For developers and contributors**, comprehensive guides are available:
+**For developers and contributors**, this enhanced fork welcomes contributions:
 
 📖 **[Development Setup Guide](docs/development-setup.md)** - Environment setup  
 🔄 **[Contributing Guidelines](docs/development.md)** - Workflow and best practices
 
-**Quick Setup Options:**
-- **Conda** (recommended for contributors)
-- **UV** (fastest for developers) 
-- **pip/venv** (universal)
-
-**Includes:** Testing commands, workflows, code standards, and pull request process.
+**Focus areas for this fork:**
+- Webhook API improvements
+- Automation integrations
+- Hook system enhancements
+- Home Assistant/n8n connectors
 
 ---
 
 ## ☕ Support This Project
 
-If you find HomeTube useful, consider supporting the project to help with development costs.
+If you find HomeTube Enhanced useful, consider supporting both projects:
 
+**Original Project Creator:**
 <div align="center">
 <a href="https://buymeacoffee.com/egalitarianmonkey" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" 
+       alt="Buy Me A Coffee" 
+       height="35" />
+</a>
+</div>
+
+**This Enhanced Fork:**
+<div align="center">
+<a href="https://buymeacoffee.com/pavarotty" target="_blank">
+  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" 
        alt="Buy Me A Coffee" 
        height="35" />
 </a>
@@ -401,8 +516,12 @@ This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE)
 
 <div align="center">
 
-**⭐ If you find this project useful, please consider starring it!**
+**⭐ Star this enhanced fork • 🍴 Fork for your own automation • 📖 [Documentation](docs/README.md) • 🐳 [Docker Hub](https://hub.docker.com/r/pavarotty/hometube)**
 
-[⭐ Star on GitHub](https://github.com/EgalitarianMonkey/hometube) • [📖 Documentation](docs/README.md) • [🐳 Docker Hub](https://github.com/EgalitarianMonkey/hometube/pkgs/container/hometube) • [☕ Buy Me a Coffee](https://buymeacoffee.com/egalitarianmonkey)
+**⭐ Also consider starring the [original project](https://github.com/EgalitarianMonkey/hometube) that made this possible!**
+
+---
+
+**🎬 HomeTube Enhanced - Download, Automate, Integrate**
 
 </div>
