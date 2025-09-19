@@ -2,20 +2,19 @@
 
 <br/>
 
-# 🎬 HomeTube Hooked 🎣
+# � HomeTube Hooked
 
 <br/>
 
 [![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)](https://python.org)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.49+-red.svg)](https://streamlit.io)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://docker.com)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-green.svg)](LICENSE)
 
 <br/>
 
-**🌐 Universal Video Downloader with Webhook Integration**
+**🌐 Enhanced HomeTube Fork with Hooks & Webhooks**
 
-*Enhanced fork with automation hooks and webhook support*
+*Fork of [EgalitarianMonkey/hometube](https://github.com/EgalitarianMonkey/hometube) with automation capabilities*
 
 <br/>
 
@@ -24,52 +23,98 @@
 <br/>
 <br/>
 
-<!-- --- -->
+## 🎯 What's New in HomeTube Hooked?
 
-<!-- ## 🎯 What is HomeTube Enhanced? -->
+This fork extends the original [HomeTube](https://github.com/EgalitarianMonkey/hometube) with powerful automation features:
 
-🎬 **HomeTube Enhanced** is an advanced fork of the original HomeTube project, featuring powerful automation capabilities through **webhooks** and **lifecycle hooks**. Download, process and organize videos with seamless integration into your existing workflows and tools.
+### 🎣 **Hook System**
+Execute custom scripts at different download stages:
+- **📋 ON_DOWNLOAD_START**: Triggered when download begins
+- **✅ ON_DOWNLOAD_SUCCESS**: Triggered when download completes successfully  
+- **❌ ON_DOWNLOAD_FAILURE**: Triggered when download fails
 
-Perfect for automated video processing pipelines, media server integration, and custom workflow automation.
+**Example use cases:**
+- Send notifications to Discord/Slack/Telegram
+- Update media server libraries automatically
+- Log download analytics
+- Trigger post-processing workflows
 
-### 🚀 **Enhanced Features**
+### 🔗 **Webhook Integration** 
+Receive HTTP requests to auto-populate download fields:
+- **POST endpoint**: `/webhook` accepts JSON payloads
+- **GET parameters**: `?url=...&filename=...` for browser integration
+- **Browser bookmarklets**: One-click download from any video page
+- **External integration**: Connect with automation tools, browser extensions, mobile apps
 
-#### 🔗 **Webhook Integration** *(NEW)*
-- **📡 HTTP API**: Trigger downloads via `POST /webhook` endpoint
-- **🌐 URL Auto-fill**: Browser-compatible query parameters (`?url=...&filename=...`)
-- **🔄 Real-time Updates**: Automatic UI synchronization
-- **🛡️ CORS Support**: Cross-origin requests enabled
-
-#### ⚙️ **Lifecycle Hooks** *(NEW)*
-- **🎬 Download Start**: Execute custom scripts when download begins
-- **✅ Success Actions**: Automated post-processing on completion  
-- **❌ Failure Handling**: Custom error recovery workflows
-- **🔧 Shell Integration**: Full shell command execution with variable substitution
-
-#### 🏠 **HomeLab Integration**
-- **🎬 Media Server Ready**: Direct integration with Plex, Jellyfin, Emby
-- **📱 Network Access**: Web interface accessible from any device
-- **🤖 Automation Ready**: Perfect for Home Assistant, n8n, Zapier workflows
-
-### ⚡ **Core Features**
+### 🏠 **Original HomeTube Features**
 - **🎯 One-Click Downloads**: Paste URL → Get perfectly organized video
-- **🚫 Ad-Free Content**: SponsorBlock integration for automatic ad removal
+- **🚫 Ad-Free Content**: Block videos' sponsors and ads  
 - **🎬 Advanced Processing**: Cut clips, embed subtitles, convert formats
-- **🔐 Unlock Restricted Videos**: Cookie authentication for member-only content
-- **📊 Quality Control**: Auto-select best quality or manual override
-- **🎥 1800+ Video Sources**: YouTube, Reddit, Vimeo, Dailymotion, TikTok, Twitch, and more
+- **🔐 Cookie Authentication**: Access restricted/member-only videos
+- **🎥 1800+ Video Sources**: YouTube, Reddit, Vimeo, TikTok, Twitch, etc.
 
-<!-- ## ⚡ Technical Highlights
+For complete feature documentation, see the [original repository](https://github.com/EgalitarianMonkey/hometube).
 
-<div align="center">
+<br/>
 
-| 🎯 **Easy to Use** | 🔧 **Powerful** | 🏠 **HomeLab Ready** |
-|:---:|:---:|:---:|
-| Web interface | 1800+ platforms | Docker deployment |
-| One-click downloads | Advanced processing | Network accessible |
-| Auto-organization | Cookie authentication | Plex/Jellyfin ready |
+## 🎣 Hook System Configuration
 
-</div> -->
+Configure custom scripts in your `.env` file:
+
+```bash
+# Execute shell commands on download events
+ON_DOWNLOAD_START=echo "Download started: {URL}" >> /data/logs/downloads.log
+ON_DOWNLOAD_SUCCESS=curl -X POST https://your-webhook.com/notify -d '{"status":"success","file":"{OUTPUT_PATH}"}'
+ON_DOWNLOAD_FAILURE=echo "Download failed: {STATUS} for {URL}" >> /data/logs/errors.log
+```
+
+**Available placeholders:**
+- `{URL}` - Video URL
+- `{FILENAME}` - Target filename
+- `{OUTPUT_PATH}` - Full path to downloaded file
+- `{STATUS}` - Download status/error message
+- `{START_SEC}` / `{END_SEC}` - Section timestamps (if cutting)
+
+<br/>
+
+## 🔗 Webhook Usage
+
+### Browser Integration
+Create bookmarklets for one-click downloads:
+```javascript
+javascript:window.open('http://your-hometube:8501/?url='+encodeURIComponent(window.location.href));
+```
+
+### POST Endpoint
+Send JSON data to auto-populate fields:
+```bash
+curl -X POST http://your-hometube:8501/webhook \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://youtube.com/watch?v=...", "filename": "My Video"}'
+```
+
+### GET Parameters  
+Direct browser navigation:
+```
+http://your-hometube:8501/?url=https://youtube.com/watch?v=...&filename=My Video
+```
+
+<br/>
+
+## 🚀 Quick Start
+
+### Docker (Recommended)
+```bash
+# Clone this fork
+git clone https://github.com/Pavarotty/hometube.git
+cd hometube
+
+# Configure hooks (optional)
+cp .env.sample .env
+# Edit .env with your hook commands
+
+# Start with Docker
+docker compose up -d
 
 <!-- --- -->
 
@@ -83,53 +128,7 @@ Perfect for automated video processing pipelines, media server integration, and 
 
 <!-- --- -->
 
-## � Enhanced Automation Features
-
-### 🔗 Webhook Integration
-
-**Remote download triggering via HTTP API**:
-
-```bash
-# Trigger download via webhook
-curl -X POST http://localhost:8501/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"url": "https://youtube.com/watch?v=example", "filename": "My Video"}'
-
-# Browser-compatible URL auto-fill
-http://localhost:8501/?url=https://youtube.com/watch?v=example&filename=My%20Video
-```
-
-**Perfect for automation tools**:
-- **🏠 Home Assistant**: Trigger downloads from automations
-- **🔗 n8n/Zapier**: Integrate with workflow automation
-- **📱 Shortcuts/Tasker**: Mobile app integration
-- **🤖 Custom Scripts**: API integration for any programming language
-
-### ⚙️ Lifecycle Hooks
-
-**Execute custom scripts at different download stages**:
-
-```bash
-# Environment variables for hooks
-ON_DOWNLOAD_START="echo 'Started: {URL}' >> /data/logs/downloads.log"
-ON_DOWNLOAD_SUCCESS="chmod 644 '{OUTPUT_PATH}' && notify-send 'Download Complete'"
-ON_DOWNLOAD_FAILURE="echo 'Failed: {URL} - {STATUS}' >> /data/logs/errors.log"
-```
-
-**Available variables**:
-- `{URL}` - Video URL
-- `{FILENAME}` - Output filename  
-- `{OUTPUT_PATH}` - Full path to downloaded file
-- `{STATUS}` - Download status
-- `{START_SEC}`, `{END_SEC}` - Section timestamps (if used)
-
-**Use cases**:
-- **📧 Notifications**: Email/Slack alerts on completion
-- **🔧 Post-processing**: Automatic transcoding, thumbnail generation
-- **📊 Logging**: Custom analytics and monitoring
-- **🔄 Workflow Integration**: Trigger next steps in your pipeline
-
-## �🛠️ HomeTube Options
+## 🛠️ HomeTube Options
 
 ### 🏠 HomeLab Integration
 
@@ -213,20 +212,20 @@ Transform your downloads with **powerful built-in video processing tools**:
 
 ### ⚙️ Essential Configuration
 
-**📋 HomeTube Enhanced uses a `.env` file for all configuration**. This includes webhook settings, lifecycle hooks, download paths, and authentication.
+**📋 HomeTube uses a `.env` file for all configuration**. This file controls download paths, authentication, subtitles, and more.
 
 ```bash
-# 1. Clone repository
-git clone https://github.com/Pavarotty/hometube-personal.git
-cd hometube-personal
+# 1. Clone repository (if not already done)
+git clone https://github.com/EgalitarianMonkey/hometube.git
+cd hometube
 
 # 2. Create your configuration file
 cp .env.sample .env
 
 # 3. Edit .env to customize your setup
 # - Set VIDEOS_FOLDER for download location
-# - Configure webhook and hook settings
-# - Set up authentication and subtitles
+# - Configure YOUTUBE_COOKIES_FILE_PATH for authentication
+# - Customize SUBTITLES_CHOICES for your languages
 ```
 
 💡 **The `.env` file will be automatically created from `.env.sample` on first run if missing!**
@@ -234,16 +233,14 @@ cp .env.sample .env
 ### 🐳 Docker (Recommended)
 
 ```bash
-# Enhanced deployment with webhook support
+# Simple deployment
 docker run -p 8501:8501 \
   -e TZ=Europe/Paris \
   -v ./downloads:/data/Videos \
   -v ./cookies:/config \
-  -v ./hooks:/app/hooks:ro \
-  pavarotty/hometube:latest
+  ghcr.io/egalitarianmonkey/hometube:latest
 
 # Access at http://localhost:8501
-# Webhook endpoint: http://localhost:8501/webhook
 ```
 
 ### 🐳 Docker Compose
@@ -253,108 +250,67 @@ docker run -p 8501:8501 \
 version: '3.8'
 services:
   hometube:
-    image: pavarotty/hometube:latest
+    image: ghcr.io/egalitarianmonkey/hometube:latest
     ports:
       - "8501:8501"
     environment:
       - TZ=Europe/Paris      # Configure timezone
       - PORT=8501            # Web interface port
-      # Webhook hooks (optional)
-      - ON_DOWNLOAD_START=echo "Started: {URL}" >> /data/logs/downloads.log
-      - ON_DOWNLOAD_SUCCESS=notify-send "Download Complete: {FILENAME}"
-      - ON_DOWNLOAD_FAILURE=echo "Failed: {STATUS}" >> /data/logs/errors.log
     volumes:
       - ./downloads:/data/Videos    # Downloads folder
       - ./cookies:/config           # Cookies folder
-      - ./hooks:/app/hooks:ro       # Custom hook scripts
-      - ./logs:/data/logs           # Log files
     restart: unless-stopped
 ```
 
-```bash
-# Deploy
-docker-compose up -d
-
-# Access at http://localhost:8501
-# Webhook endpoint: http://localhost:8501/webhook
+# Access the interface
+http://localhost:8501
 ```
 
-### 🔗 Webhook Configuration Example
+<br/>
 
-Create a `.env` file with webhook automation:
+## 📚 Documentation
 
-```bash
-# Webhook hooks for automation
-ON_DOWNLOAD_START=echo "$(date): START {URL}" >> /data/logs/download.log
-ON_DOWNLOAD_SUCCESS=chmod 644 "{OUTPUT_PATH}" && echo "$(date): SUCCESS {OUTPUT_PATH}" >> /data/logs/download.log
-ON_DOWNLOAD_FAILURE=echo "$(date): FAILED {URL} - {STATUS}" >> /data/logs/download.log
+For detailed setup and usage instructions, refer to the original project documentation:
+- **[Original Repository](https://github.com/EgalitarianMonkey/hometube)** - Complete documentation
+- **[Installation Guide](https://github.com/EgalitarianMonkey/hometube/blob/main/docs/installation.md)** - Setup instructions
+- **[Usage Guide](https://github.com/EgalitarianMonkey/hometube/blob/main/docs/usage.md)** - Feature documentation
+- **[Docker Guide](https://github.com/EgalitarianMonkey/hometube/blob/main/docs/docker.md)** - Container deployment
 
-# Example: Plex library refresh after download
-ON_DOWNLOAD_SUCCESS=curl -X POST "http://plex:32400/library/sections/1/refresh?X-Plex-Token=YOUR_TOKEN"
+### 📋 Quick Reference - Fork Documentation
 
-# Example: Home Assistant notification
-ON_DOWNLOAD_SUCCESS=curl -X POST "http://homeassistant:8123/api/services/notify/mobile_app_phone" -H "Authorization: Bearer YOUR_TOKEN" -d '{"message":"Video downloaded: {FILENAME}"}'
-```
+- **[Hook Scripts via Files](docs/hooks-scripts.md)** - Running hook commands from mounted scripts
+- **[Webhook API](docs/webhook.md)** - Webhook endpoint details
 
-### 🏠 Local Installation
+<br/>
 
-**Prerequisites**: Python 3.10+, FFmpeg
+## 🎣 Fork Differences
 
-**Option 1: Using pip (Recommended)**
-```bash
-# Create virtual environment
-python -m venv hometube-env
-source hometube-env/bin/activate  # On Windows: hometube-env\Scripts\activate
+This fork adds:
+- **Hook System**: Execute custom scripts on download events
+- **Webhook Integration**: HTTP endpoints for automation  
+- **Browser Integration**: Bookmarklets and GET parameter support
 
-# Install dependencies including yt-dlp
-pip install ".[local]"
+All original HomeTube features are preserved and fully compatible.
 
-# Run the application
-streamlit run app/main.py
-# OR
-python run.py
-```
+### 💭 Why This Fork?
 
-**Option 2: Using conda**
-```bash
-# Create conda environment
-conda create -n hometube python=3.10
-conda activate hometube
+I really loved the original HomeTube project and wanted to expand it with some automation features that I found useful for my personal use case. The hook system and webhook integration allow for better integration with home automation setups and make the download workflow much more streamlined.
 
-# Install dependencies including yt-dlp
-pip install ".[local]"
+<br/>
 
-# Run the application
-streamlit run app/main.py
-```
+## 📄 License
 
-**Option 3: Using uv (Fastest)**
-```bash
-# Install uv if not already installed
-curl -LsSf https://astral.sh/uv/install.sh | sh
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
 
-# Install dependencies including yt-dlp
-uv pip install ".[local]"
+See [LICENSE](LICENSE) file for details.
 
-# Run with uv
-uv run streamlit run app/main.py
-```
+---
 
-**Access at**: http://localhost:8501
+<div align="center">
 
+**🎣 HomeTube Hooked** - *Enhanced fork of [EgalitarianMonkey/hometube](https://github.com/EgalitarianMonkey/hometube)*
 
-## ⚙️ Configuration Guide
-
-### 🔧 Environment Variables
-
-HomeTube configuration is managed through the `.env` file:
-
-| Variable | Purpose | Example |
-|---------|---------|---------|
-| `VIDEOS_FOLDER` | Where videos will be moved at the end of download | `./downloads` |
-| `TMP_DOWNLOAD_FOLDER` | Temporary download location | `./tmp` |
-| `YOUTUBE_COOKIES_FILE_PATH` | Authentication for private videos | `./cookies/youtube_cookies.txt` |
-| `COOKIES_FROM_BROWSER` | Alternative browser auth | `chrome,firefox,brave` |
+</div>
 | `UI_LANGUAGE` | UI language. English (en) and French (fr) supported | `en` |
 | `SUBTITLES_CHOICES` | Default subtitle languages | `en,fr,es` |
 | `PORT` | Web interface port | `8501` |
@@ -424,73 +380,43 @@ Expected output:
 
 ## 📈 Project Status
 
-- ✅ **Enhanced Fork**: Based on the original HomeTube with automation improvements
-- 🔄 **Active Development**: Focused on webhook integration and automation features
-- 🧪 **Well Tested**: Core functionality tested and reliable
-- 📦 **Production Ready**: Docker images available on Docker Hub
-- 🏠 **HomeLab Optimized**: Designed for automated self-hosted environments
-- 🤖 **Automation Ready**: Perfect for Home Assistant, n8n, and custom workflows
+- ✅ **Stable**: Core functionality tested and reliable
+- 🔄 **Active Development**: Regular updates and improvements
+- 🧪 **Test Coverage**: 84% on testable modules ([details](docs/testing.md))
+- 📦 **Production Ready**: Docker images available on GHCR
+- 🏠 **HomeLab Optimized**: Designed for self-hosted environments
 
-## � Original Project
+## 📆 Coming Features
 
-This is an enhanced fork of the original [HomeTube project](https://github.com/EgalitarianMonkey/hometube) by EgalitarianMonkey.
+Check out the roadmap for upcoming features and enhancements:
 
-**🆕 What's New in This Fork:**
-- **🔗 Webhook API**: HTTP endpoint for remote download triggering
-- **⚙️ Lifecycle Hooks**: Custom script execution at download stages
-- **🌐 Browser Integration**: URL auto-fill via query parameters
-- **🤖 Automation Ready**: Perfect for Home Assistant and workflow tools
-
-**💝 Credits**: Huge thanks to [EgalitarianMonkey](https://github.com/EgalitarianMonkey) for creating the amazing foundation that made these enhancements possible.
-
-## � Enhanced Features Roadmap
-
-**Current enhancements:**
-- ✅ Webhook endpoint implementation
-- ✅ Lifecycle hooks system
-- ✅ Browser query parameter support
-- ✅ CORS and cross-origin request support
-
-**Planned improvements:**
-- 🔄 Advanced webhook authentication
-- 🔄 Batch download via webhook
-- 🔄 Real-time download progress API
-- 🔄 Enhanced hook variable substitution
+**📋 See the complete roadmap**: [todo.md](todo.md)
 
 ---
 
 ## 🤝 Contributing & Development
 
-**For developers and contributors**, this enhanced fork welcomes contributions:
+**For developers and contributors**, comprehensive guides are available:
 
 📖 **[Development Setup Guide](docs/development-setup.md)** - Environment setup  
 🔄 **[Contributing Guidelines](docs/development.md)** - Workflow and best practices
 
-**Focus areas for this fork:**
-- Webhook API improvements
-- Automation integrations
-- Hook system enhancements
-- Home Assistant/n8n connectors
+**Quick Setup Options:**
+- **Conda** (recommended for contributors)
+- **UV** (fastest for developers) 
+- **pip/venv** (universal)
+
+**Includes:** Testing commands, workflows, code standards, and pull request process.
 
 ---
 
 ## ☕ Support This Project
 
-If you find HomeTube Enhanced useful, consider supporting both projects:
+If you find HomeTube useful, consider supporting the project to help with development costs.
 
-**Original Project Creator:**
 <div align="center">
 <a href="https://buymeacoffee.com/egalitarianmonkey" target="_blank">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-orange.png" 
-       alt="Buy Me A Coffee" 
-       height="35" />
-</a>
-</div>
-
-**This Enhanced Fork:**
-<div align="center">
-<a href="https://buymeacoffee.com/pavarotty" target="_blank">
-  <img src="https://cdn.buymeacoffee.com/buttons/v2/default-blue.png" 
        alt="Buy Me A Coffee" 
        height="35" />
 </a>
@@ -503,25 +429,14 @@ Every contribution is appreciated! 🙏
 
 ## 📄 License
 
-This project is licensed under the AGPL-3.0 License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0).
 
-## 🙏 Acknowledgments
-
-- **[yt-dlp](https://github.com/yt-dlp/yt-dlp)** - Universal video downloader supporting 1800+ platforms
-- **[Streamlit](https://streamlit.io/)** - Excellent web app framework  
-- **[SponsorBlock](https://sponsor.ajay.app/)** - Community-driven sponsor detection (YouTube)
-- **[FFmpeg](https://ffmpeg.org/)** - Multimedia processing framework
+See [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
 
-**⭐ Star this enhanced fork • 🍴 Fork for your own automation • 📖 [Documentation](docs/README.md) • 🐳 [Docker Hub](https://hub.docker.com/r/pavarotty/hometube)**
-
-**⭐ Also consider starring the [original project](https://github.com/EgalitarianMonkey/hometube) that made this possible!**
-
----
-
-**🎬 HomeTube Enhanced - Download, Automate, Integrate**
+**🎣 HomeTube Hooked** - *Enhanced fork of [EgalitarianMonkey/hometube](https://github.com/EgalitarianMonkey/hometube)*
 
 </div>

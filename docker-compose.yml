@@ -1,15 +1,12 @@
 services:
   hometube:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: hometube:local
+    image: pavarotty/hometube:latest
     container_name: hometube
     env_file: .env
     environment:
       - TZ=${TZ:-Europe/Paris}
     ports:
-      - "${PORT:-8510}:8501"
+      - "${PORT:-8501}:8501"
 
     volumes:
       - "${VIDEOS_FOLDER_DOCKER_HOST:-./downloads}:/app/downloads"
