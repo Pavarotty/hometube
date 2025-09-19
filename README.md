@@ -75,6 +75,8 @@ ON_DOWNLOAD_FAILURE=echo "Download failed: {STATUS} for {URL}" >> /data/logs/err
 - `{STATUS}` - Download status/error message
 - `{START_SEC}` / `{END_SEC}` - Section timestamps (if cutting)
 
+Note: The container includes `ssh`/`scp` (OpenSSH client) so hooks can securely copy files or execute remote commands on other machines using `ssh user@host` or `scp {OUTPUT_PATH} user@host:/path/`.
+
 <br/>
 
 ## 🔗 Webhook Usage

@@ -11,7 +11,8 @@ LABEL org.opencontainers.image.licenses="AGPL-3.0-or-later"
 RUN apk add --no-cache \
     tini \
     ca-certificates \
-    curl
+    curl \
+    openssh
 
 WORKDIR /app
 
